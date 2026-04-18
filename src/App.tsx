@@ -1,11 +1,5 @@
 import { HashRouter as Router, Routes, Route, Link } from "react-router-dom";
-import { 
-  Mail, ShieldCheck, FileSignature, Lock, Database, 
-  UserCheck, Fingerprint, History, FileLock, Search, Sparkles,
-  QrCode, Image as ImageIcon, AlertTriangle, RefreshCcw
-} from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, FormEvent } from "react";
+import { motion } from "framer-motion";
 
 // استيراد الصفحات
 import Home from "./Pages/Home";
@@ -14,7 +8,7 @@ import Legal from "./Pages/Legal";
 import Standards from "./Pages/Standards";
 import JoinUs from "./Pages/JoinUs"; 
 
-// --- بيانات المنظومة (الأصلية) ---
+// --- بيانات المنظومة (الأصلية للفوتر) ---
 const generalSocial = [
   { name: 'facebook', file: 'Facebook.png' },
   { name: 'whatsapp', file: 'whatsapp.png' },
@@ -41,38 +35,14 @@ export default function App() {
           <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/95 via-[#050505]/50 to-[#050505]" />
         </div>
 
-        {/* Header */}
-        <header className="absolute top-0 inset-x-0 z-50 h-16 md:h-20 flex items-center justify-between px-6 md:px-12 bg-transparent">
-          <div className="flex items-center gap-3 md:gap-4 font-black italic text-[10px] md:text-[11px] tracking-widest uppercase">
-            <button className="border border-white/20 hover:border-white/50 bg-white/5 text-white px-4 py-1.5 md:px-6 md:py-2 rounded-full transition-all duration-300">تسجيل دخول</button>
-            <button className="border border-royal-blue/50 hover:border-royal-blue bg-royal-blue/10 hover:bg-royal-blue text-white px-4 py-1.5 md:px-6 md:py-2 rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(65,105,225,0.15)]">إنشاء حساب</button>
-          </div>
-
-          <nav className="hidden md:flex items-center gap-8 text-[11px] font-black italic uppercase tracking-tighter">
-            {[
-              { name: "الرئيسية", path: "/" },
-              { name: "عن النظام", path: "/about" },
-              { name: "معايير الموثوقية", path: "/standards" },
-              { name: "الاتفاقية القانونية", path: "/legal" },
-            ].map((link) => (
-              <Link 
-                key={link.name} 
-                to={link.path} 
-                className="relative text-white hover:text-royal-blue transition-colors duration-300 group pb-1"
-              >
-                {link.name}
-                <span className="absolute bottom-0 right-0 w-0 h-[1.5px] bg-white transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            ))}
-          </nav>
-
+        {/* Header - تم التعديل ليحتوي على اللوجو والاسم فقط */}
+        <header className="absolute top-0 inset-x-0 z-50 h-16 md:h-20 flex items-center justify-end px-6 md:px-12 bg-transparent">
           <Link to="/" className="flex items-center gap-2.5 cursor-pointer group" dir="ltr">
-            {/* اللوجو ثابت تماماً ولا يتحرك إلا عند التفاعل بالماوس */}
             <motion.img 
               src="/favicon.png" 
               className="w-8 h-8 md:w-10 md:h-10 object-contain" 
               alt="Logo" 
-              whileHover={{ rotateY: 360 }} // لفة رأسية (Flip) عند الـ Hover فقط
+              whileHover={{ rotateY: 360 }}
               transition={{ duration: 0.6, ease: "easeInOut" }}
             />
             <div className="flex flex-col leading-none">
@@ -83,7 +53,7 @@ export default function App() {
         </header>
 
         {/* Content */}
-        <main className="relative z-10">
+        <main className="relative z-10 pt-24 md:pt-32"> 
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />
@@ -93,7 +63,7 @@ export default function App() {
           </Routes>
         </main>
 
-        {/* Footer */}
+        {/* Footer - كما هو تماماً */}
         <footer className="relative z-10 py-16 border-t border-white/5 bg-[#050505]/90 backdrop-blur-xl mt-16 text-center">
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12 italic">
