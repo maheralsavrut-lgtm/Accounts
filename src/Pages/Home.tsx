@@ -8,7 +8,7 @@ import {
   createUserWithEmailAndPassword 
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { Mail, Lock, ArrowRight, ShieldCheck, Sparkles } from "lucide-react";
+import { Mail, Lock, LogIn, UserPlus, Shield } from "lucide-react";
 
 export default function Home() {
   const [isLogin, setIsLogin] = useState(true);
@@ -23,10 +23,10 @@ export default function Home() {
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
-        alert("أهلاً بك في نظام بلاك بوكس ⚡");
+        alert("تم تسجيل الدخول بنجاح");
       } else {
         const res = await createUserWithEmailAndPassword(auth, email, password);
-        // لحظة منح الهدية: إضافة 5 Bx في قاعدة البيانات فوراً
+        // إضافة 5 Bx فوراً في قاعدة البيانات للحسابات الجديدة
         await setDoc(doc(db, "users", res.user.uid), {
           uid: res.user.uid,
           email: email,
@@ -34,16 +34,16 @@ export default function Home() {
           tier: "Free",
           createdAt: new Date()
         });
-        alert("مبروك! تم إنشاء حسابك ومنحك 5 Bx هدية افتتاحية 🎁");
+        alert("أهلاً بك! تم إنشاء حسابك ومنحك 5 Bx هدية");
       }
     } catch (err: any) {
-      alert("خطأ: " + err.message);
+      alert("عذراً، تأكد من البيانات المدخلة");
     } finally {
       setLoading(false);
     }
   };
 
-  // الدخول السريع بجوجل
+  // الدخول عبر جوجل
   const handleGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
@@ -51,7 +51,6 @@ export default function Home() {
       const userRef = doc(db, "users", res.user.uid);
       const userSnap = await getDoc(userRef);
 
-      // لو أول مرة يدخل بجوجل، نفتح له حساب وندي له الـ 5 Bx
       if (!userSnap.exists()) {
         await setDoc(userRef, {
           uid: res.user.uid,
@@ -60,64 +59,55 @@ export default function Home() {
           tier: "Free",
           createdAt: new Date()
         });
-        alert("أهلاً بك! تم تفعيل حسابك بـ 5 Bx هدية 🚀");
-      } else {
-        alert("تم تسجيل الدخول بنجاح");
       }
+      alert("تم الدخول بنجاح");
     } catch (err) {
       console.error(err);
     }
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center p-6 italic" dir="rtl">
+    <div className="min-h-[75vh] flex items-center justify-center p-6 font-sans">
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-lg bg-white/[0.02] border border-white/5 p-8 md:p-12 rounded-[2.5rem] backdrop-blur-3xl shadow-2xl relative overflow-hidden"
+        className="w-full max-w-md bg-[#0A0A0A] border border-white/5 p-8 md:p-10 rounded-3xl shadow-2xl relative overflow-hidden"
       >
-        {/* توهج خلفي هادئ */}
-        <div className="absolute -top-24 -right-24 w-64 h-64 bg-royal-blue/5 blur-[120px] rounded-full" />
-        
-        <div className="text-center mb-10 relative z-10">
-          <motion.div 
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 4, repeat: Infinity }}
-            className="inline-block p-4 bg-royal-blue/10 rounded-3xl mb-4 border border-royal-blue/20"
-          >
-            <ShieldCheck size={35} className="text-royal-blue" />
-          </motion.div>
-          <h1 className="text-2xl font-black uppercase tracking-tighter mb-2 text-white">Black Box ID</h1>
-          <p className="text-gray-500 text-[9px] font-bold tracking-[0.2em] uppercase">نظام التحقق الموحد والوصول الرقمي</p>
+        {/* اللوجو والعنوان */}
+        <div className="text-center mb-8 relative z-10">
+          <div className="inline-block p-3 bg-royal-blue/10 rounded-2xl mb-4 border border-royal-blue/20 text-royal-blue">
+            <Shield size={28} />
+          </div>
+          <h1 className="text-xl font-bold tracking-tight text-white mb-1">Black Box Accounts</h1>
+          <p className="text-gray-500 text-[11px] uppercase tracking-widest font-medium">حساب بلاك بوكس الموحد</p>
         </div>
 
         <div className="space-y-4 relative z-10">
-          {/* زر Google */}
+          {/* زر Google المحدث بمسار الصورة الجديد */}
           <button 
             onClick={handleGoogle}
-            className="w-full bg-white text-black font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-gray-200 transition-all active:scale-95"
+            className="w-full bg-white text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-100 transition-all active:scale-[0.98] text-sm"
           >
-            <img src="/google-icon.png" className="w-5 h-5" alt="" />
-            <span className="text-[10px] uppercase tracking-widest">المتابعة باستخدام Google</span>
+            <img src="/google.png" className="w-4 h-4" alt="Google" />
+            المتابعة باستخدام Google
           </button>
 
-          <div className="flex items-center gap-4 my-6">
-            <div className="h-px bg-white/5 flex-1" />
-            <span className="text-[8px] text-gray-600 font-black uppercase tracking-[0.3em]">أو</span>
-            <div className="h-px bg-white/5 flex-1" />
+          <div className="relative py-2">
+            <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+            <div className="relative flex justify-center text-[9px] uppercase"><span className="bg-[#0A0A0A] px-3 text-gray-600 font-bold tracking-[0.2em]">أو البريد الإلكتروني</span></div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-3">
             <div className="relative">
               <input 
                 type="email" 
                 placeholder="البريد الإلكتروني" 
                 required
-                className="w-full bg-black/40 border border-white/5 p-4 pr-12 rounded-2xl focus:border-royal-blue/50 outline-none transition-all font-bold text-sm text-white"
+                className="w-full bg-white/[0.02] border border-white/10 p-4 pr-11 rounded-xl focus:border-royal-blue/40 outline-none transition-all text-sm text-white"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+              <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600" size={16} />
             </div>
 
             <div className="relative">
@@ -125,29 +115,43 @@ export default function Home() {
                 type="password" 
                 placeholder="كلمة السر" 
                 required
-                className="w-full bg-black/40 border border-white/5 p-4 pr-12 rounded-2xl focus:border-royal-blue/50 outline-none transition-all font-bold text-sm text-white"
+                className="w-full bg-white/[0.02] border border-white/10 p-4 pr-11 rounded-xl focus:border-royal-blue/40 outline-none transition-all text-sm text-white"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+              <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600" size={16} />
             </div>
 
             <button 
               type="submit"
               disabled={loading}
-              className="w-full bg-royal-blue text-white font-black py-4 rounded-2xl hover:shadow-[0_0_30px_rgba(65,105,225,0.2)] transition-all flex items-center justify-center gap-2 group active:scale-95"
+              className="w-full bg-royal-blue text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2 text-sm active:scale-[0.98]"
             >
-              <span className="text-[10px] uppercase tracking-widest">
-                {loading ? "جاري المعالجة..." : isLogin ? "دخول إلى النظام" : "إنشاء حساب + 5 BX"}
-              </span>
-              <ArrowRight size={16} className="group-hover:-translate-x-1 transition-transform" />
+              {loading ? "جاري المعالجة..." : isLogin ? "تسجيل الدخول" : "إنشاء حساب جديد"}
+              {!loading && (isLogin ? <LogIn size={16} /> : <UserPlus size={16} />)}
             </button>
           </form>
+
+          {/* تنويه الهدية يظهر فقط في حالة إنشاء حساب جديد */}
+          <AnimatePresence>
+            {!isLogin && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 p-3 bg-royal-blue/5 border border-royal-blue/10 rounded-xl text-center"
+              >
+                <p className="text-[10px] text-royal-blue font-bold tracking-wide">
+                   سيتم إضافة 5 Bx لمحفظتك فور اكتمال التسجيل 🎁
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           <div className="text-center mt-6">
             <button 
               onClick={() => setIsLogin(!isLogin)}
-              className="text-[9px] text-gray-500 font-bold hover:text-white transition-colors uppercase tracking-[0.2em]"
+              className="text-[11px] text-gray-500 hover:text-white transition-colors font-medium underline underline-offset-4"
             >
               {isLogin ? "لا تملك حساباً؟ انضم للمنظومة الآن" : "لديك حساب بالفعل؟ سجل دخولك"}
             </button>
