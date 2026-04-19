@@ -1,5 +1,8 @@
-import { HashRouter as Router, Routes, Route, Navigate, Link } from "react-router-dom";
+import { HashRouter as Router, Routes, Route, Navigate, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { auth } from "./lib/firebase"; // تأكد أن المسار صحيح لملف firebase.ts
+import { signOut } from "firebase/auth";
+import { LogOut, Construction, Shield } from "lucide-react";
 
 // استيراد الصفحات
 import Home from "./Pages/Home";
@@ -7,6 +10,46 @@ import About from "./Pages/About";
 import Legal from "./Pages/Legal";
 import Standards from "./Pages/Standards";
 import JoinUs from "./Pages/JoinUs"; 
+
+// --- مكون لوحة التحكم المؤقت لكسر الجمود وإضافة زر الخروج ---
+const DashboardPlaceholder = () => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (err) {
+      console.error("خطأ أثناء تسجيل الخروج", err);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center py-40 text-center italic">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white/5 border border-white/10 p-12 rounded-[2.5rem] backdrop-blur-xl shadow-2xl"
+      >
+        <Construction className="text-royal-blue mb-6 mx-auto animate-bounce" size={48} />
+        <h2 className="text-3xl font-black uppercase mb-3 tracking-tighter text-white">
+          لوحة التحكم قيد التطوير
+        </h2>
+        <p className="text-gray-500 text-sm mb-10 max-w-xs mx-auto font-bold">
+          مرحباً بك في منظومة Black Box.. حسابك نشط الآن ونعمل على تجهيز واجهتك البرمجية.
+        </p>
+        
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-3 bg-red-600/10 border border-red-600/20 text-red-500 px-10 py-4 rounded-2xl hover:bg-red-600 hover:text-white transition-all duration-300 group font-black text-xs uppercase shadow-lg shadow-red-600/5"
+        >
+          <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" />
+          تسجيل الخروج من المنظومة
+        </button>
+      </motion.div>
+    </div>
+  );
+};
 
 // --- بيانات المنظومة ---
 const generalSocial = [
@@ -30,8 +73,8 @@ export default function App() {
       <div className="min-h-screen bg-[#050505] text-white selection:bg-royal-blue font-sans relative overflow-x-hidden" dir="rtl">
         
         {/* Background Layer */}
-        <div className="fixed inset-0 z-0">
-          <div className="absolute inset-0 bg-cover bg-center opacity-8" style={{ backgroundImage: "url('/marketing-background.png')" }} />
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-cover bg-center opacity-10" style={{ backgroundImage: "url('/marketing-background.png')" }} />
           <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/95 via-[#050505]/50 to-[#050505]" />
         </div>
 
@@ -52,22 +95,18 @@ export default function App() {
           </Link>
         </header>
 
-        {/* Content */}
+        {/* Content Area */}
         <main className="relative z-10 pt-24 md:pt-32"> 
           <Routes>
-            {/* توجيه الصفحة الرئيسية للوجن */}
             <Route path="/" element={<Navigate to="/login" />} />
-            
-            {/* مسارات الحسابات - بنبعت الـ mode هنا */}
             <Route path="/login" element={<Home mode="login" />} />
             <Route path="/signup" element={<Home mode="signup" />} />
             
-            {/* المسارات الديناميكية اللي طلبتها */}
-            <Route path="/:userID" element={<div className="text-center py-20 italic">لوحة التحكم (قيد التطوير)</div>} />
-            <Route path="/:userID/Profile" element={<div className="text-center py-20 italic">الملف الشخصي (قيد التطوير)</div>} />
-            <Route path="/:userID/Settings" element={<div className="text-center py-20 italic">الإعدادات (قيد التطوير)</div>} />
+            {/* مسارات لوحة التحكم والديناميك */}
+            <Route path="/:userID" element={<DashboardPlaceholder />} />
+            <Route path="/:userID/Profile" element={<DashboardPlaceholder />} />
+            <Route path="/:userID/Settings" element={<DashboardPlaceholder />} />
 
-            {/* باقي الصفحات */}
             <Route path="/about" element={<About />} />
             <Route path="/standards" element={<Standards />} />
             <Route path="/legal" element={<Legal />} />
@@ -79,6 +118,7 @@ export default function App() {
         <footer className="relative z-10 py-16 border-t border-white/5 bg-[#050505]/90 backdrop-blur-xl mt-16 text-center italic">
           <div className="container mx-auto px-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+              {/* قسم قانوني */}
               <div className="flex flex-col items-center">
                 <h4 className="text-white font-black mb-6 border-b-2 border-royal-blue inline-block pb-1">قانوني</h4>
                 <ul className="text-gray-500 text-sm font-bold space-y-2.5 text-center">
@@ -98,6 +138,7 @@ export default function App() {
                 </ul>
               </div>
               
+              {/* قسم القطاعات */}
               <div className="flex flex-col items-center">
                 <h4 className="text-white font-black mb-6 border-b-2 border-royal-blue inline-block pb-1">القطاعات</h4>
                 <ul className="text-gray-500 text-sm font-bold space-y-2.5 text-center">
@@ -110,6 +151,7 @@ export default function App() {
                 </ul>
               </div>
 
+              {/* قسم التواصل المباشر */}
               <div className="flex flex-col items-center">
                 <h4 className="text-white font-black mb-6 border-b-2 border-royal-blue inline-block pb-1">تواصل مباشر</h4>
                 <div className="bg-white/5 rounded-2xl border border-white/5 overflow-hidden shadow-2xl mb-6 w-full">
