@@ -1,12 +1,13 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getAuth, Auth } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
 
 // Black Box AI Studio - Firebase Configuration
-// تم تحديث الـ authDomain لربط الهوية البصرية بالدومين الخاص
+// تم تصحيح الـ authDomain لضمان عمل نظام التسجيل بضغطة واحدة بدون 404
 const firebaseConfig = {
   apiKey: "AIzaSyDKk5oIaE1LYOmoYMd2t6PnitXwXxHTSl4",
-  authDomain: "accounts.bbtech.cloud", 
+  // ✅ التعديل الجوهري: نستخدم الدومين الافتراضي لفيربيز كـ Auth Handler
+  authDomain: "black-box-c4847.firebaseapp.com", 
   projectId: "black-box-c4847",
   storageBucket: "black-box-c4847.firebasestorage.app",
   messagingSenderId: "824717519714",
@@ -16,8 +17,8 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Export Authentication and Database
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Export Authentication and Database with Types
+export const auth: Auth = getAuth(app);
+export const db: Firestore = getFirestore(app);
 
 export default app;
