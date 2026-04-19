@@ -47,7 +47,7 @@ export default function App() {
             />
             <div className="flex flex-col leading-none">
               <span className="text-lg md:text-xl font-black italic uppercase tracking-tighter text-white">Black Box</span>
-              <span className="text-[8px] md:text-[9px] font-bold text-royal-blue tracking-[0.3em] uppercase">Verify</span>
+              <span className="text-[8px] md:text-[9px] font-bold text-royal-blue tracking-[0.3em] uppercase">accounts</span>
             </div>
           </Link>
         </header>
