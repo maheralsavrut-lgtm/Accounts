@@ -1,125 +1,137 @@
 import { motion } from "framer-motion";
-import { 
-  CheckCircle2, Fingerprint, ShieldAlert, Binary, 
-  FileCheck2, Clock4, ServerCrash, Network 
-} from "lucide-react";
+import { Gavel, AlertTriangle, ShieldCheck, Zap, Coins, UserX, Globe, History, MailCheck, Code2 } from "lucide-react";
+import { useState } from "react";
 
-export default function Standards() {
-  const fadeIn = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-  };
-
-  const standards = [
-    {
-      icon: <Binary className="text-royal-blue" size={28} />,
-      title: "تطابق البصمة الرقمية (Hash Integrity)",
-      desc: "نعتمد معيار SHA-256 العالمي. أي تغيير ولو في بكسل واحد داخل الملف يؤدي لتغيير البصمة تماماً، مما يضمن كشف أي تلاعب فوراً."
-    },
-    {
-      icon: <Clock4 className="text-royal-blue" size={28} />,
-      title: "التوقيت الذري الموحد (UTC Timestamp)",
-      desc: "يتم سحب التوقيت من خوادم زمنية ذرية (NTP) لضمان تسجيل لحظة التوثيق بدقة لا تقبل التشكيك قانونياً أو زمنياً."
-    },
-    {
-      icon: <Network className="text-royal-blue" size={28} />,
-      title: "اللا مركزية في التحقق",
-      desc: "نظام التحقق متاح للعامة عبر الـ QR Code، مما يسمح لأي جهة التأكد من صحة الشهادة دون الحاجة للوصول لبياناتك الخاصة."
-    },
-    {
-      icon: <ShieldAlert className="text-royal-blue" size={28} />,
-      title: "بروتوكول عدم التعديل (Immutability)",
-      desc: "بمجرد إصدار الشهادة، تُقفل البيانات في قاعدة بياناتنا المشفرة بصيغة 'للقراءة فقط'، ولا يمكن لأي موظف أو حتى مدير النظام تعديلها."
-    }
-  ];
-
+const TermsSection = ({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) => {
+  const [isOpen, setIsOpen] = useState(true);
   return (
-    <div className="pt-32 pb-20 px-6 italic text-right relative z-10" dir="rtl">
-      {/* Header */}
-      <section className="max-w-4xl mx-auto text-center mb-20">
-        <motion.div 
-          initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}
-          className="inline-block border border-royal-blue/30 bg-royal-blue/5 px-4 py-1 rounded-full text-[10px] text-royal-blue font-black uppercase tracking-[0.3em] mb-6"
-        >
-          Reliability Protocol 2.1
-        </motion.div>
-        <motion.h1 
-          initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: 0.1 }} variants={fadeIn}
-          className="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-6 text-white"
-        >
-          معايير <span className="text-royal-blue">الموثوقية</span> التقنية
-        </motion.h1>
-        <motion.p 
-          initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: 0.2 }} variants={fadeIn}
-          className="text-gray-500 font-bold max-w-2xl mx-auto"
-        >
-          يخضع نظام Black Box Verify لأعلى معايير الأمن السيبراني لضمان أن كل وثيقة تخرج من منصتنا هي دليل قاطع لا يقبل النقض.
-        </motion.p>
-      </section>
-
-      {/* Standards Grid */}
-      <section className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 mb-24">
-        {standards.map((s, i) => (
-          <motion.div 
-            key={i}
-            initial="hidden" whileInView="visible" viewport={{ once: true }} transition={{ delay: i * 0.1 }} variants={fadeIn}
-            className="p-8 border border-white/5 bg-white/[0.02] rounded-[2rem] hover:bg-white/[0.04] transition-all group"
-          >
-            <div className="flex items-start gap-5">
-              <div className="p-3 bg-black rounded-xl border border-white/5 group-hover:border-royal-blue/50 transition-colors">
-                {s.icon}
-              </div>
-              <div className="space-y-3">
-                <h3 className="text-lg font-black text-white italic">{s.title}</h3>
-                <p className="text-gray-500 text-sm font-bold leading-relaxed">{s.desc}</p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </section>
-
-      {/* Verification Level Section */}
-      <motion.section 
-        initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeIn}
-        className="max-w-5xl mx-auto bg-royal-blue/5 border border-royal-blue/20 rounded-[3rem] p-10 md:p-16 relative overflow-hidden"
+    <div className="border-b border-white/5 overflow-hidden transition-all bg-white/[0.01] mb-4 rounded-2xl border border-white/5 backdrop-blur-sm">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-6 hover:bg-white/[0.03] transition-colors text-right"
       >
-        <div className="absolute top-0 left-0 p-8 opacity-10">
-          <Fingerprint size={150} className="text-royal-blue" />
+        <div className="flex items-center gap-4 text-white flex-row-reverse">
+          <Icon className="text-royal-blue" size={24} />
+          <span className="font-black text-xl italic uppercase tracking-tighter">{title}</span>
         </div>
+        <motion.span animate={{ rotate: isOpen ? 180 : 0 }} className="text-gray-500">▼</motion.span>
+      </button>
+      <motion.div 
+        initial={false}
+        animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+        className="overflow-hidden"
+      >
+        <div className="p-8 text-gray-400 text-sm leading-relaxed font-bold italic space-y-6 text-right dir-rtl border-t border-white/5">
+          {children}
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
+export default function TermsOfService() {
+  return (
+    <div className="min-h-screen pt-24 pb-24 px-6 bg-transparent text-white">
+      <div className="max-w-5xl mx-auto">
         
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          <div>
-            <h2 className="text-3xl font-black text-white mb-6 uppercase tracking-tighter">درجات التحقق</h2>
-            <div className="space-y-4">
-              {[
-                "تحقق من هوية الرافع عبر البروتوكولات الثنائية (2FA).",
-                "فحص سلامة الملف من الفيروسات قبل التوثيق.",
-                "مطابقة البصمة الرقمية مع سجلات الأرشفة العالمية.",
-                "إصدار شهادة مشفرة غير قابلة للتزوير المادي أو الرقمي."
-              ].map((text, idx) => (
-                <div key={idx} className="flex items-center gap-3 text-gray-400 font-bold text-sm">
-                  <CheckCircle2 size={18} className="text-royal-blue shrink-0" />
-                  <span>{text}</span>
-                </div>
-              ))}
+        {/* Header Section */}
+        <div className="text-center mb-20">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }}
+            className="inline-block p-5 bg-royal-blue/10 rounded-full mb-8 border border-royal-blue/20 shadow-2xl shadow-royal-blue/10"
+          >
+            <Gavel size={50} className="text-royal-blue" />
+          </motion.div>
+          <h1 className="text-5xl md:text-6xl font-black text-white italic mb-6 uppercase tracking-tighter">بنود الخدمة (شروط الاستخدام)</h1>
+          <p className="text-gray-500 font-black italic max-w-2xl mx-auto uppercase text-[12px] tracking-[0.4em] leading-loose">
+             اتفاقية الاستخدام القانونية الملزمة لمنظومة BLACK BOX TECHNOLOGY
+          </p>
+        </div>
+
+        <div className="space-y-6 text-right">
+          
+          {/* 1. القبول والأهلية */}
+          <TermsSection title="1. قبول الشروط والأهلية القانونية" icon={ShieldCheck}>
+            <p>• باستخدامك لخدمات Black Box، فإنك تقر بأنك بلغت السن القانوني (13 عاماً على الأقل) وتمتلك الأهلية الكاملة لإبرام هذا العقد.</p>
+            <p>• <span className="text-white">القبول الصريح:</span> إن إنشاء حساب أو الضغط على "تسجيل" يعني موافقتك المطلقة على هذه البنود وعلى سياسة الخصوصية المرتبطة بها.</p>
+          </TermsSection>
+
+          {/* 2. سياسة المحفظة والعملات المالية (Bx System) */}
+          <TermsSection title="2. القواعد المالية وعملة Bx" icon={Coins}>
+            <p>عملة <span className="text-white">Bx</span> هي عملة افتراضية مخصصة للاستخدام داخل منظومة بلاك بوكس فقط:</p>
+            <ul className="list-disc list-inside space-y-3 pr-4">
+              <li><span className="text-white underline">عدم القابلية للاسترداد:</span> بمجرد شراء باقة Bx، لا يمكن استرداد المبلغ نقدياً تحت أي ظرف، حيث يتم التعامل مع الشحن كشراء لـ "حقوق استخدام الخدمة".</li>
+              <li><span className="text-white underline">التحويلات:</span> يُحظر تماماً محاولة بيع أو تداول عملة Bx خارج المنصة الرسمية.</li>
+              <li><span className="text-white underline">الحظر المالي:</span> في حال اكتشاف استخدام بطاقات مسروقة أو عمليات مشبوهة، يتم حظر الحساب نهائياً ومصادرة الرصيد دون الرجوع للمستخدم.</li>
+            </ul>
+          </TermsSection>
+
+          {/* 3. ضوابط الذكاء الاصطناعي والاستخدام العادل */}
+          <TermsSection title="3. شروط استخدام AI Studio" icon={Zap}>
+            <p>أنت تمنحنا حق معالجة بياناتك لإنتاج المحتوى، وتلتزم بالآتي:</p>
+            <ul className="list-disc list-inside space-y-3 pr-4 text-red-400">
+              <li>يُحظر استخدام الذكاء الاصطناعي لتوليد محتوى يروج للكراهية، العنف، أو الإباحية.</li>
+              <li>يُحظر انتحال الشخصيات (Deepfake) دون إذن قانوني موثق.</li>
+              <li>المنظومة غير مسؤولة عن حقوق الملكية الفكرية للمدخلات التي يرفعها المستخدم (مثل الصور المسروقة).</li>
+            </ul>
+          </TermsSection>
+
+          {/* 4. إخلاء مسؤولية وكالة التسويق */}
+          <TermsSection title="4. إخلاء مسؤولية قطاع التسويق" icon={AlertTriangle}>
+            <div className="bg-red-500/10 border-r-4 border-red-500 p-6 rounded-xl">
+              <p className="text-white font-black italic">بند هام جداً:</p>
+              <p className="mt-2 text-gray-300">
+                منظومة Black Box تقدم خدمات "زيادة التفاعل" كأداة تقنية مساعدة. نحن لا نضمن استقرار النتائج بنسبة 100% نظراً لاعتمادها على منصات خارجية (مثل فيسبوك، يوتيوب، تيك توك). أي إجراء يتخذ من قبل تلك المنصات ضد حساب المستخدم هو خارج نطاق مسؤوليتنا القانونية أو التقنية.
+              </p>
+            </div>
+          </TermsSection>
+
+          {/* 5. ملكية الأكواد والتوثيق الرقمي (ISO Standards) */}
+          <TermsSection title="5. حماية الملكية الفكرية والتوثيق" icon={Code2}>
+            <p>• <span className="text-white">التوثيق:</span> خدمة التوثيق الرقمي تثبت أن المستخدم هو "أول من سجل" البصمة الرقمية للأصل (الكود/التصميم) لدينا.</p>
+            <p>• <span className="text-white">المسؤولية:</span> التوثيق لا يمنح ملكية قانونية مطلقة إذا ثبت أن الأصل مسروق من طرف ثالث قبل تاريخ التسجيل لدينا.</p>
+            <p>• <span className="text-white">الأمان:</span> تلتزم بلاك بوكس بحماية بصمة الكود (Hash) وضمان عدم التلاعب بسجلات التوقيت الزمني (Timestamps).</p>
+          </TermsSection>
+
+          {/* 6. منصة التواصل والقواعد المجتمعية */}
+          <TermsSection title="6. شروط منصة التواصل الاجتماعي" icon={Globe}>
+            <p>• <span className="text-white">السلوك:</span> يحق للمنظومة حذف أي محتوى أو حظر أي مستخدم يمارس التحرش، التنمر، أو ينشر برمجيات خبيثة.</p>
+            <p>• <span className="text-white">البيانات:</span> أنت تمنح Black Box رخصة عالمية، مجانية، لاستضافة وعرض المحتوى الذي تنشره علناً داخل المنصة.</p>
+          </TermsSection>
+
+          {/* 7. الحظر وحذف الحساب */}
+          <TermsSection title="7. إنهاء الخدمة والحظر" icon={UserX}>
+            <p>• يحق لـ Black Box تعليق أو إنهاء حسابك في حال مخالفة أي بند من هذه الشروط، دون سابق إنذار.</p>
+            <p>• عند إغلاق الحساب بسبب مخالفة قانونية، تسقط كافة حقوق المستخدم في المطالبة بأي أرصدة متبقية في المحفظة.</p>
+          </TermsSection>
+
+          {/* 8. بند التحديثات الرسمية - الجملة الذهبية */}
+          <div className="mt-10 p-10 bg-royal-blue/10 border-2 border-royal-blue/20 rounded-[3rem] relative overflow-hidden group backdrop-blur-md">
+            <MailCheck className="absolute -left-10 -top-10 text-royal-blue/20 w-40 h-40 group-hover:rotate-12 transition-transform" />
+            <h3 className="text-2xl font-black text-white italic mb-4 flex items-center gap-3">
+              <History className="text-royal-blue" /> التعديلات والإخطار القانوني
+            </h3>
+            <div className="space-y-6 text-white font-bold italic leading-relaxed text-right">
+              <p>
+                تمتلك إدارة <span className="text-royal-blue underline italic">Black Box Technology</span> الحق الحصري في تعديل "بنود الخدمة" هذه في أي وقت تراه مناسباً.
+              </p>
+              <div className="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-sm shadow-xl">
+                <p className="text-lg">
+                  "بمجرد اعتماد أي تعديل، سيتم إرسال النسخة الجديدة فوراً إلى <span className="text-royal-blue underline">بريدك الإلكتروني المسجل</span>. يعتبر استمرارك في استخدام المنظومة بعد تاريخ الإرسال بمثابة <span className="text-royal-blue uppercase tracking-widest">إقرار وموافقة قانونية ملزمة</span> منك على البنود الجديدة."
+                </p>
+              </div>
             </div>
           </div>
-          <div className="bg-black/40 backdrop-blur-xl border border-white/10 p-8 rounded-3xl text-center">
-             <FileCheck2 size={50} className="mx-auto text-royal-blue mb-4" />
-             <div className="text-white font-black text-xl mb-2 italic">شهادة موثقة</div>
-             <div className="text-[10px] text-gray-600 tracking-[0.2em] uppercase font-bold">كل ملف يحصل على تقرير فني كامل</div>
-             <div className="mt-6 pt-6 border-t border-white/5 text-royal-blue text-xs font-black tracking-widest uppercase animate-pulse">
-               ISO 27001 Compliant Strategy
-             </div>
-          </div>
-        </div>
-      </motion.section>
 
-      {/* Summary Footer */}
-      <div className="mt-24 text-center">
-        <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.5em]">
-          Black Box Verify System <span className="mx-2 text-royal-blue">/</span> Zero Manipulation Policy
-        </p>
+        </div>
+
+        {/* Final Footer */}
+        <div className="mt-20 py-10 border-t border-white/5 text-center">
+          <p className="text-gray-600 text-[10px] font-black italic uppercase tracking-[0.5em]">
+            LEGAL COMPLIANCE DIVISION - BLACK BOX TECHNOLOGY © 2026
+          </p>
+        </div>
+
       </div>
     </div>
   );
