@@ -1,39 +1,72 @@
-# 🐺 Black Box | Official Verification System
+# 🐺 Black Box Accounts | The Core Ecosystem
 
-![Status](https://img.shields.io/badge/Status-Live-royalbell?style=for-the-badge&color=0047AB)
-![Version](https://img.shields.io/badge/Version-1.0.0-black?style=for-the-badge)
+![Status](https://img.shields.io/badge/Status-Live-0047AB?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.1.0-black?style=for-the-badge)
+![Ecosystem](https://img.shields.io/badge/Currency-Bx-blue?style=for-the-badge)
 
-بروتوكول التحقق الرسمي من المستندات الرقمية والورقية الصادرة عن مجموعة **Black Box Technology**. يضمن هذا النظام سلامة العقود، الفواتير، وشهادات الخبرة عبر بصمة رقمية مشفرة.
+بوابة الحسابات الموحدة ونظام إدارة المشتركين لشركة **Black Box Technology**. المحرك الأساسي الذي يربط هوية المستخدم بجميع خدمات المجموعة مع نظام محفظة رقمية مشفرة.
 
-## 🛠 المنظومة التقنية (Ecosystem)
+## 🌐 الدومين الرسمي
+تتم جميع عمليات المصادقة والربط عبر:
+`https://accounts.bbtech.cloud`
 
-النظام مرتبط بشكل متكامل مع منصات وخدمات المجموعة:
-* [AI Studio](https://studio.bbtech.cloud) - صناعة المحتوى المتطور بالذكاء الاصطناعي.
-* [Marketing Agency](https://agency.bbtech.cloud) - وكالة التسويق والحلول الإبداعية.
-* [Social App](https://social.bbtech.cloud) - التطبيق الاجتماعي الخاص بالمنظومة.
-* [Software Products](https://products.bbtech.cloud) - معرض المنتجات والبرمجيات الخاصة بالشركة.
-* [Market Box](https://market.bbtech.cloud) - المتجر والمنصة التجارية.
-* [Wallet](https://wallet.bbtech.cloud) - المحفظة الرقمية وإدارة العملة الافتراضية (Bx).
+---
 
-## 🔒 الميزات الأمنية (Security Features)
+## 🛠 هيكل المنظومة (The Ecosystem)
 
-1.  **Verify ID:** كود فريد لكل مستند يربطه مباشرة بالنسخة الأصلية في قاعدة البيانات.
-2.  **Document Secure:** نظام تشفير رقمي متقدم يكشف أي محاولة تلاعب في ملفات الـ PDF.
-3.  **Identity Confirmed:** تأكيد هوية الجهة المصدرة عبر البصمة الرقمية للمديرين المفوضين.
-4.  **Record Verified:** أرشفة أبدية غير قابلة للحذف لضمان وجود أثر قانوني وتقني دائم.
+تعمل حسابات Black Box كجسر مركزي يغذي 6 قطاعات حيوية:
+
+| القطاع | الوصف | الرابط |
+| :--- | :--- | :--- |
+| **AI Studio** | محرك توليد الصور والموسيقى والفيديو | [Visit](https://bbtech.cloud/AiStudio) |
+| **BX Wallet** | إدارة العملة الرقمية وشحن الباقات | [Visit](https://accounts.bbtech.cloud/wallet) |
+| **Verification** | توثيق الهوية والمستندات الرسمية | [Visit](https://accounts.bbtech.cloud/verify) |
+| **Products Box** | معرض المنتجات والبرمجيات الخاصة | [Visit](https://products.bbtech.cloud) |
+| **Marketing** | الحلول الإبداعية وإدارة العلامات التجارية | [Visit](https://agency.bbtech.cloud) |
+| **Social App** | منصة التواصل والدردشة (BMassenger) | [Visit](https://social.bbtech.cloud) |
+
+---
+
+## 💰 نظام العملة والاقتصاد (Bx System)
+
+تعتمد المنظومة على عملة **Bx** لتشغيل الخدمات التقنية:
+
+### 🪙 تكلفة الخدمات
+* **Grafia (Image):** 1 Bx
+* **Cloth/Location Edit:** 2 Bx
+* **Upscaling:** 3 Bx
+* **Tune (Audio Separate):** 5 Bx
+* **AI Song:** 10 Bx
+* **Motion (Clip):** 25 Bx
+
+### 💳 باقات الاشتراك
+1.  **Free:** (5 Gift Points) + علامة مائية.
+2.  **Pro:** (200 EGP/mo) -> 150 Bx شهرياً + رندر سريع + Personal Voice Model.
+3.  **Founder:** (1000 EGP/yr) -> 1000 Bx فورية + 200 شهرياً + دعم VIP.
+
+---
+
+## 🔒 الميزات الأمنية (Security)
+
+1.  **Single Sign-On (SSO):** حساب واحد للدخول لكل تطبيقات المنظومة.
+2.  **Wallet Encryption:** تشفير كامل لبيانات المحفظة وسجل العمليات.
+3.  **Identity Confirmed:** نظام توثيق متقدم للمستندات والشهادات.
+4.  **Referral Logic:** نظام مكافآت آمن يمنح (5 Bx) للداعي والمدعو عند التسجيل.
+
+---
 
 ## 🚀 التشغيل (Getting Started)
 
-### المتطلبات التقنية
-* `Node.js` (الإصدار الأخير)
+### المتطلبات
+* `Node.js` (LTS)
 * `React` + `Vite`
-* `Lucide React` للأيقونات
-* `Framer Motion` للأنيميشن
+* `Firebase SDK`
+* `Tailwind CSS`
 
-### خطوات التثبيت والتشغيل
+### خطوات التثبيت
 ```bash
 # Clone the repository
-git clone [https://github.com/blackbox/verify-system.git](https://github.com/blackbox/verify-system.git)
+git clone [https://github.com/blackbox/accounts-system.git](https://github.com/blackbox/accounts-system.git)
 
 # Install dependencies
 npm install
