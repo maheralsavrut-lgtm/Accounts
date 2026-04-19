@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom"; // مهم جداً للتنقل
 import { auth, db } from "../lib/firebase";
 import { 
   GoogleAuthProvider, 
@@ -10,15 +11,17 @@ import {
 import { doc, getDoc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { Mail, Lock, LogIn, UserPlus, Shield, Eye, EyeOff, AlertCircle } from "lucide-react";
 
-export default function Home() {
-  const [isLogin, setIsLogin] = useState(true);
-  const [identifier, setIdentifier] = useState(""); // بياخد الإيميل أو الـ ID
+// لاحظ هنا بنستقبل mode كـ Prop
+export default function Home({ mode }: { mode: 'login' | 'signup' }) {
+  const navigate = useNavigate();
+  const [identifier, setIdentifier] = useState(""); 
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // التحقق لو المدخل إيميل (عشان نلون الكادر أحمر لو غلط)
+  const isLogin = mode === 'login';
+
   const isEmailInput = identifier.includes("@");
   const isEmailValid = useMemo(() => {
     if (identifier === "" || !isEmailInput) return true;
@@ -34,10 +37,10 @@ export default function Home() {
     try {
       let finalEmail = identifier;
 
-      // لو اليوزر كاتب ID مش إيميل، بنروح نجيب الإيميل المرتبط بالـ ID ده من Firestore
+      // لو ID بنجيب الإيميل المرتبط بيه
       if (!isEmailInput && isLogin) {
         const usersRef = collection(db, "users");
-        const q = query(usersRef, where("id", "==", identifier)); // بنفترض إنك مخزن ID لكل يوزر
+        const q = query(usersRef, where("id", "==", identifier)); 
         const querySnapshot = await getDocs(q);
         
         if (querySnapshot.empty) {
@@ -47,19 +50,19 @@ export default function Home() {
       }
 
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, finalEmail, password);
-        // هنا هتحوله لصفحة البروفايل (عن طريق React Router أو Redirect)
+        const res = await signInWithEmailAndPassword(auth, finalEmail, password);
+        navigate(`/${res.user.uid}`); // توجيه لصفحة الـ ID
       } else {
         const res = await createUserWithEmailAndPassword(auth, finalEmail, password);
-        // إنشاء بروفايل جديد بـ 5 Bx و ID عشوائي (أو تعتمد الـ UID)
         await setDoc(doc(db, "users", res.user.uid), {
           uid: res.user.uid,
-          id: identifier.split('@')[0], // ID مؤقت من الإيميل
+          id: identifier.split('@')[0], // ID افتراضي
           email: finalEmail,
           bx_balance: 5,
           tier: "Free",
           createdAt: new Date()
         });
+        navigate(`/${res.user.uid}/Profile`); // توجيه للبروفايل
       }
     } catch (err: any) {
       if (err.code === "auth/user-not-found" || err.code === "auth/invalid-credential" || err.code === "auth/wrong-password") {
@@ -80,7 +83,6 @@ export default function Home() {
       const userRef = doc(db, "users", res.user.uid);
       const userSnap = await getDoc(userRef);
 
-      // احترافية 2 في 1: لو أول مرة، افتح له حساب وادي له الهدية
       if (!userSnap.exists()) {
         await setDoc(userRef, {
           uid: res.user.uid,
@@ -90,8 +92,10 @@ export default function Home() {
           tier: "Free",
           createdAt: new Date()
         });
+        navigate(`/${res.user.uid}/Profile`);
+      } else {
+        navigate(`/${res.user.uid}`);
       }
-      // التحويل لصفحة البروفايل آلياً
     } catch (err) {
       setErrorMsg("فشل الدخول عبر جوجل.");
     } finally {
@@ -103,34 +107,40 @@ export default function Home() {
     <div className="min-h-[80vh] flex items-center justify-center p-6 font-sans">
       <motion.div 
         initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-[#0A0A0A] border border-white/5 p-8 md:p-10 rounded-3xl shadow-2xl relative overflow-hidden"
+        className="w-full max-w-md bg-[#0A0A0A] border border-white/5 p-8 md:p-10 rounded-3xl shadow-2xl relative"
       >
         <div className="text-center mb-8">
           <div className="inline-block p-3 bg-royal-blue/10 rounded-2xl mb-4 border border-royal-blue/20 text-royal-blue">
             <Shield size={28} />
           </div>
           <h1 className="text-xl font-bold text-white mb-1 tracking-tight">Black Box Accounts</h1>
-          <p className="text-gray-500 text-[11px] uppercase tracking-widest">حساب بلاك بوكس الموحد</p>
+          <p className="text-gray-500 text-[11px] uppercase tracking-widest font-bold">
+            {isLogin ? "تسجيل الدخول" : "إنشاء حساب جديد"}
+          </p>
         </div>
 
         <div className="space-y-4">
           <button onClick={handleGoogle} className="w-full bg-white text-black font-bold py-3.5 rounded-xl flex items-center justify-center gap-3 hover:bg-royal-blue hover:text-white transition-all group text-sm">
-            <img src="/google.png" className="w-4 h-4 group-hover:brightness-0 group-hover:invert transition-all" alt="G" />
+            <img src="/google.png" className="w-4 h-4 group-hover:brightness-0 group-hover:invert" alt="G" />
             المتابعة باستخدام Google
           </button>
 
           <div className="relative py-2 text-center text-[9px] uppercase">
             <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-            <span className="relative bg-[#0A0A0A] px-3 text-gray-600 font-bold tracking-[0.2em]">أو البيانات الشخصية</span>
+            <span className="relative bg-[#0A0A0A] px-3 text-gray-600 font-black tracking-[0.2em]">أو يدوياً</span>
           </div>
 
           <AnimatePresence mode="wait">
             {errorMsg && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl flex flex-col items-center gap-2">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl flex flex-col items-center gap-2 text-center">
                 <div className="text-red-500 text-[11px] font-bold flex items-center gap-2">
                   <AlertCircle size={14} /> {errorMsg}
                 </div>
-                {isLogin && <button onClick={() => { setIsLogin(false); setErrorMsg(""); }} className="text-[10px] bg-red-500/20 text-red-500 px-4 py-1.5 rounded-lg font-black hover:bg-red-500 hover:text-white transition-all">إنشاء حساب جديد</button>}
+                {isLogin && (
+                    <button onClick={() => navigate("/signup")} className="text-[10px] bg-red-500/20 text-red-500 px-4 py-1.5 rounded-lg font-black hover:bg-red-500 hover:text-white transition-all">
+                        أنشئ حساباً الآن
+                    </button>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
@@ -151,7 +161,7 @@ export default function Home() {
               <input 
                 type={showPassword ? "text" : "password"} 
                 placeholder="كلمة السر" 
-                className="w-full bg-white/[0.02] border border-white/10 p-4 pr-11 pl-11 rounded-xl focus:border-royal-blue/40 outline-none text-sm text-white"
+                className="w-full bg-white/[0.02] border border-white/10 p-4 pr-11 pl-11 rounded-xl focus:border-royal-blue/40 outline-none text-sm text-white font-bold"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -161,14 +171,17 @@ export default function Home() {
               </button>
             </div>
 
-            <button type="submit" disabled={loading} className="w-full bg-royal-blue text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2 text-sm">
-              {loading ? "جاري المعالجة..." : isLogin ? "دخول" : "إنشاء حساب + 5 Bx"}
+            <button type="submit" disabled={loading} className="w-full bg-royal-blue text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-royal-blue/10">
+              {loading ? "جاري المعالجة..." : isLogin ? "دخول" : "إنشاء الحساب + 5 Bx"}
               {!loading && (isLogin ? <LogIn size={16} /> : <UserPlus size={16} />)}
             </button>
           </form>
 
           <div className="text-center mt-6">
-            <button onClick={() => { setIsLogin(!isLogin); setErrorMsg(""); }} className="text-[11px] text-gray-500 hover:text-white underline underline-offset-4">
+            <button 
+              onClick={() => navigate(isLogin ? "/signup" : "/login")} 
+              className="text-[11px] text-gray-500 hover:text-white underline underline-offset-4 font-bold transition-colors"
+            >
               {isLogin ? "لا تملك حساباً؟ انضم للمنظومة" : "لديك حساب بالفعل؟ سجل دخولك"}
             </button>
           </div>
