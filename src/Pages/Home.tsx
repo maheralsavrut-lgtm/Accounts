@@ -60,11 +60,44 @@ export default function Home({ mode }: { mode: 'login' | 'signup' }) {
         await signInWithEmailAndPassword(auth, email, password);
         navigate(`/profile`);
       } else {
+        let referrerDocId = null;
+        let referrerBalance = 0;
+
+        // التحقق من كود الدعوة في الباك إند
+        if (referralCode) {
+          const q = query(collection(db, "users"), where("myReferralCode", "==", referralCode.toUpperCase()));
+          const querySnapshot = await getDocs(q);
+
+          if (querySnapshot.empty) {
+            setLoading(false);
+            return setErrorMsg("كود الدعوة غير صحيح");
+          } else {
+            referrerDocId = querySnapshot.docs[0].id;
+            referrerBalance = querySnapshot.docs[0].data().bx_balance || 0;
+          }
+        }
+
         const res = await createUserWithEmailAndPassword(auth, email, password);
+
+        // تحديث رصيد الداعي
+        if (referrerDocId) {
+          await setDoc(doc(db, "users", referrerDocId), { 
+            bx_balance: referrerBalance + 5 
+          }, { merge: true });
+        }
+
+        // إنشاء بروفايل المستخدم الجديد بكوده الخاص
         await setDoc(doc(db, "users", res.user.uid), {
-          uid: res.user.uid, email, phone, referralCode, bx_balance: 5, tier: "Free", createdAt: new Date()
+          uid: res.user.uid,
+          email,
+          phone,
+          usedReferralCode: referralCode ? referralCode.toUpperCase() : null,
+          myReferralCode: res.user.uid.slice(0, 6).toUpperCase(),
+          bx_balance: referrerDocId ? 10 : 5, 
+          tier: "Free",
+          createdAt: new Date()
         });
-        // مسح البيانات بعد التسجيل الناجح
+
         sessionStorage.clear();
         navigate(`/${res.user.uid}/Profile`);
       }
@@ -81,7 +114,14 @@ export default function Home({ mode }: { mode: 'login' | 'signup' }) {
       const userRef = doc(db, "users", res.user.uid);
       const userSnap = await getDoc(userRef);
       if (!userSnap.exists()) {
-        await setDoc(userRef, { uid: res.user.uid, email: res.user.email, bx_balance: 5, tier: "Free", createdAt: new Date() });
+        await setDoc(userRef, { 
+          uid: res.user.uid, 
+          email: res.user.email, 
+          myReferralCode: res.user.uid.slice(0, 6).toUpperCase(),
+          bx_balance: 5, 
+          tier: "Free", 
+          createdAt: new Date() 
+        });
       }
       sessionStorage.clear();
       navigate(`/${res.user.uid}`);
