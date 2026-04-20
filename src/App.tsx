@@ -1,19 +1,40 @@
+import React, { useEffect, useState } from "react";
 import { HashRouter as Router, Routes, Route, Navigate, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { auth } from "./lib/firebase"; // تأكد أن المسار صحيح لملف firebase.ts
-import { signOut } from "firebase/auth";
-import { LogOut, Construction, Shield } from "lucide-react";
+import { auth } from "./lib/firebase"; 
+import { 
+  signOut, 
+  onAuthStateChanged, 
+  setPersistence, 
+  browserLocalPersistence 
+} from "firebase/auth";
+import { LogOut, Construction, Shield, Loader2 } from "lucide-react";
 
-// استيراد الصفحات
+// استيراد الصفحات (تأكد من وجود الملفات في مسار Pages)
 import Home from "./Pages/Home";
 import About from "./Pages/About";
 import Legal from "./Pages/Legal";
 import Standards from "./Pages/Standards";
 import JoinUs from "./Pages/JoinUs"; 
 
-// --- مكون لوحة التحكم المؤقت لكسر الجمود وإضافة زر الخروج ---
+// --- مكون لوحة التحكم الذكي مع خاصية التوجيه التلقائي ---
 const DashboardPlaceholder = () => {
   const navigate = useNavigate();
+  const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    // فحص هل يوجد رابط عودة في الـ URL (جاي من Verify مثلاً)
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnTo = urlParams.get('returnTo');
+
+    if (returnTo) {
+      setIsRedirecting(true);
+      // التوجيه فوراً للرابط المطلوب مع فك التشفير
+      setTimeout(() => {
+        window.location.href = decodeURIComponent(returnTo);
+      }, 1500); // تأخير بسيط لإعطاء تجربة مستخدم سلسة
+    }
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -23,6 +44,18 @@ const DashboardPlaceholder = () => {
       console.error("خطأ أثناء تسجيل الخروج", err);
     }
   };
+
+  if (isRedirecting) {
+    return (
+      <div className="flex flex-col items-center justify-center py-40 text-center">
+        <Loader2 className="text-royal-blue animate-spin mb-4" size={40} />
+        <h2 className="text-xl font-black italic text-white tracking-widest uppercase">
+          Redirecting to System...
+        </h2>
+        <p className="text-gray-500 text-xs mt-2 font-bold">جارٍ نقلك لمنظومة التوثيق الرقمي</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center py-40 text-center italic">
@@ -52,22 +85,46 @@ const DashboardPlaceholder = () => {
 };
 
 // --- بيانات المنظومة ---
-const generalSocial = [
+const socialLinks = [
   { name: 'facebook', file: 'Facebook.png' },
   { name: 'whatsapp', file: 'whatsapp.png' },
   { name: 'instagram', file: 'Instagram.png' },
   { name: 'tiktok', file: 'tiktok.png' },
   { name: 'youtube', file: 'YouTube.png' },
   { name: 'x', file: 'x.png' },
-];
-
-const techSocial = [
   { name: 'linkedin', file: 'LinkedIn.png' },
   { name: 'github', file: 'GitHub copy.png' },
   { name: 'discord', file: 'Discord.png' }
 ];
 
 export default function App() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // ضبط استمرارية الجلسة لتكون Local (لا تخرج بقفل المتصفح)
+    setPersistence(auth, browserLocalPersistence)
+      .then(() => {
+        // مراقبة حالة المستخدم
+        return onAuthStateChanged(auth, (user) => {
+          setLoading(false);
+        });
+      })
+      .catch((error) => {
+        console.error("Persistence Error:", error);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="text-royal-blue font-black italic animate-pulse tracking-[0.5em] text-[10px]">
+          INITIALIZING BLACK BOX ACCOUNTS...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Router>
       <div className="min-h-screen bg-[#050505] text-white selection:bg-royal-blue font-sans relative overflow-x-hidden" dir="rtl">
@@ -102,7 +159,6 @@ export default function App() {
             <Route path="/login" element={<Home mode="login" />} />
             <Route path="/signup" element={<Home mode="signup" />} />
             
-            {/* مسارات لوحة التحكم والديناميك */}
             <Route path="/:userID" element={<DashboardPlaceholder />} />
             <Route path="/:userID/Profile" element={<DashboardPlaceholder />} />
             <Route path="/:userID/Settings" element={<DashboardPlaceholder />} />
@@ -122,17 +178,9 @@ export default function App() {
               <div className="flex flex-col items-center">
                 <h4 className="text-white font-black mb-6 border-b-2 border-royal-blue inline-block pb-1">قانوني</h4>
                 <ul className="text-gray-500 text-sm font-bold space-y-2.5 text-center">
-                  {[
-                    { name: "الأمان والشفافية", path: "#" },
-                    { name: "السياسات العامة", path: "#" },
-                    { name: "سياسة الخصوصية", path: "#" },
-                    { name: "اتفاقية الاستخدام", path: "/legal" },
-                    { name: "عنا", path: "/about" },
-                    { name: "وظائف", path: "#" },
-                  ].map((item, idx) => (
-                    <li key={idx} className="relative group pb-1 transition-colors duration-300 hover:text-royal-blue cursor-pointer">
-                      {item.path.startsWith('/') ? <Link to={item.path}>{item.name}</Link> : item.name}
-                      <span className="absolute bottom-0 right-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                  {[{ name: "اتفاقية الاستخدام", path: "/legal" }, { name: "عنا", path: "/about" }, { name: "الخصوصية", path: "#" }].map((item, idx) => (
+                    <li key={idx} className="hover:text-royal-blue cursor-pointer transition-colors">
+                      <Link to={item.path}>{item.name}</Link>
                     </li>
                   ))}
                 </ul>
@@ -141,67 +189,26 @@ export default function App() {
               {/* قسم القطاعات */}
               <div className="flex flex-col items-center">
                 <h4 className="text-white font-black mb-6 border-b-2 border-royal-blue inline-block pb-1">القطاعات</h4>
-                <ul className="text-gray-500 text-sm font-bold space-y-2.5 text-center">
-                  {["الذكاء الاصطناعي", "وكالة التسويق", "منصة التواصل", "صندوق المنتجات", "المحفظة الموحدة", "التوثيق الرقمي"].map((sector, idx) => (
-                    <li key={idx} className="relative group pb-1 transition-colors duration-300 hover:text-royal-blue tracking-tight cursor-pointer">
-                      {sector}
-                      <span className="absolute bottom-0 right-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                    </li>
-                  ))}
-                </ul>
+                <p className="text-gray-500 text-xs font-bold leading-relaxed">
+                  الذكاء الاصطناعي • التوثيق الرقمي • منصة التواصل <br/> صندوق المنتجات • المحفظة الموحدة
+                </p>
               </div>
 
-              {/* قسم التواصل المباشر */}
+              {/* قسم التواصل */}
               <div className="flex flex-col items-center">
                 <h4 className="text-white font-black mb-6 border-b-2 border-royal-blue inline-block pb-1">تواصل مباشر</h4>
-                <div className="bg-white/5 rounded-2xl border border-white/5 overflow-hidden shadow-2xl mb-6 w-full">
-                  <table className="w-full text-[10px] md:text-[12px] font-bold">
-                    <tbody>
-                      {[
-                        { label: "الإدارة", email: "admin@bbtech.cloud" },
-                        { label: "الدعم", email: "support@bbtech.cloud" },
-                        { label: "عام", email: "info@bbtech.cloud" },
-                      ].map((e, i) => (
-                        <tr key={i} className="border-b border-white/5 last:border-0 hover:bg-white/5 transition-colors">
-                          <td className="p-3 text-right bg-white/[0.01] border-l border-white/5 px-4 text-gray-400 whitespace-nowrap">{e.label}</td>
-                          <td className="p-3 text-royal-blue text-left px-4 font-black tracking-tighter uppercase" dir="ltr">{e.email}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="flex flex-col gap-4 w-full items-center">
-                  <div className="flex items-center gap-4">
-                    {generalSocial.map((social) => (
-                      <a key={social.name} href="#" className="group transition-all duration-300">
-                        <img src={`/${social.file}`} alt={social.name} className="w-8 h-8 object-contain opacity-50 group-hover:opacity-100 group-hover:scale-110" />
-                      </a>
-                    ))}
-                  </div>
-                  <div className="flex items-center gap-4">
-                    {techSocial.map((social) => (
-                      <a key={social.name} href="#" className="group transition-all duration-300">
-                        <img src={`/${social.file}`} alt={social.name} className="w-8 h-8 object-contain opacity-50 group-hover:opacity-100 group-hover:scale-110" />
-                      </a>
-                    ))}
-                  </div>
+                <div className="flex flex-wrap justify-center gap-3">
+                  {socialLinks.slice(0, 9).map((social) => (
+                    <img key={social.name} src={`/${social.file}`} alt={social.name} className="w-6 h-6 opacity-40 hover:opacity-100 transition-opacity cursor-pointer" />
+                  ))}
                 </div>
               </div>
             </div>
 
-            <div className="pt-8 border-t border-white/5 flex flex-col items-center gap-3 font-black">
-              <div className="flex items-center gap-4 opacity-40 grayscale hover:grayscale-0 transition-all duration-700 flex-row-reverse">
-                  <img src="/favicon.png" alt="Black Box" className="w-8 h-8 object-contain" />
-                  <div className="h-4 w-px bg-white/20" />
-                  <div className="flex flex-col items-center">
-                    <span className="text-xs tracking-[0.3em]">BLACK BOX TECHNOLOGY</span>
-                    <span className="text-[9px] tracking-[0.1em] text-gray-500 mt-1 uppercase font-bold">LLC Co, ETC 2026</span>
-                  </div>
-              </div>
-              <p className="text-gray-700 text-[10px] tracking-[0.5em] uppercase text-center leading-tight">
-                Copyright © 2026 Black Box Technology System <br className="md:hidden" /> 
-                <span className="text-royal-blue/30">|</span> All Rights Reserved
-              </p>
+            <div className="pt-8 border-t border-white/5 flex flex-col items-center gap-3">
+              <span className="text-[10px] tracking-[0.5em] text-gray-600 uppercase">
+                Copyright © 2026 Black Box Technology System
+              </span>
             </div>
           </div>
         </footer>
